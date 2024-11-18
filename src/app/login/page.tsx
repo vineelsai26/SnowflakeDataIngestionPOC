@@ -17,7 +17,7 @@ export default function Login() {
 
 		async function tokenGenerator(code: string) {
 			try {
-				const res = await fetch('/api/tokens', {
+				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_PROXY_URL}/api/tokens`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -58,7 +58,7 @@ export default function Login() {
 				className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
 				onClick={() => {
 					return redirect(
-						`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/oauth/authorize?response_type=code&client_id=${process.env.NEXT_PUBLIC_SNOWFLAKE_CLIENT_ID}&redirect_uri=${protocol}//${hostname}/login&scope=web:connect&prompt=consent`,
+						`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/oauth/authorize?response_type=code&client_id=${encodeURIComponent(process.env.NEXT_PUBLIC_SNOWFLAKE_CLIENT_ID!)}&redirect_uri=${protocol}//${hostname}/login`,
 					)
 				}}>
 				Login

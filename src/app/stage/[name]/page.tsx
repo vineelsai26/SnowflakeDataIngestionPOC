@@ -66,8 +66,8 @@ function FilesTable({
 										stage.name.toLowerCase() + '/',
 										''
 									)}', 3600);`,
-									database: 'TEST_APP_2',
-									schema: 'TEST_SCHEMA',
+									database: process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE,
+									schema: process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA,
 								}),
 							}
 						)
@@ -104,8 +104,8 @@ function FilesTable({
 										stage.name.toLowerCase() + '/',
 										''
 									)}', 3600);`,
-									database: 'TEST_APP_2',
-									schema: 'TEST_SCHEMA',
+									database: process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE,
+									schema: process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA,
 								}),
 							}
 						)
@@ -131,8 +131,8 @@ function FilesTable({
 								},
 								body: JSON.stringify({
 									statement: `REMOVE @${file.name}`,
-									database: 'TEST_APP_2',
-									schema: 'TEST_SCHEMA',
+									database: process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE,
+									schema: process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA,
 								}),
 							}
 						)
@@ -172,8 +172,8 @@ function FilesTable({
 								},
 								body: JSON.stringify({
 									statement: `COPY FILES INTO @${copyToStage} FROM @${file.name}`,
-									database: 'TEST_APP_2',
-									schema: 'TEST_SCHEMA',
+									database: process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE,
+									schema: process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA,
 								}),
 							}
 						)
@@ -239,7 +239,7 @@ export default function StageView() {
 
 		async function getUserStages(access_token: string) {
 			const stage_response = await fetch(
-				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/TEST_APP_2/schemas/TEST_SCHEMA/stages?like=${params.name}`,
+				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/${process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE}/schemas/${process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA}/stages?like=${params.name}`,
 				{
 					method: 'GET',
 					headers: {
@@ -250,16 +250,19 @@ export default function StageView() {
 				}
 			)
 			if (stage_response.status === 401) {
-				const token_response = await fetch('/api/tokens', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						refresh_token: refresh_token,
-						grant_type: 'refresh_token',
-					}),
-				})
+				const token_response = await fetch(
+					`${process.env.NEXT_PUBLIC_BACKEND_PROXY_URL}/api/tokens`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							refresh_token: refresh_token,
+							grant_type: 'refresh_token',
+						}),
+					}
+				)
 
 				const token_data = await token_response.json()
 				if (token_data.error) {
@@ -283,7 +286,7 @@ export default function StageView() {
 			}
 
 			const stages_response = await fetch(
-				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/TEST_APP_2/schemas/TEST_SCHEMA/stages`,
+				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/${process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE}/schemas/${process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA}/stages`,
 				{
 					method: 'GET',
 					headers: {
@@ -300,8 +303,8 @@ export default function StageView() {
 
 			const stage_files_url =
 				folderParam === null
-					? `https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/TEST_APP_2/schemas/TEST_SCHEMA/stages/${params.name}/files`
-					: `https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/TEST_APP_2/schemas/TEST_SCHEMA/stages/${params.name}/files?pattern=.*${folderParam}.*`
+					? `https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/${process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE}/schemas/${process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA}/stages/${params.name}/files`
+					: `https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/${process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE}/schemas/${process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA}/stages/${params.name}/files?pattern=.*${folderParam}.*`
 
 			const stage_files_response = await fetch(stage_files_url, {
 				method: 'GET',
@@ -398,7 +401,7 @@ export default function StageView() {
 							formData.append('file', files[0])
 						}
 
-						await fetch('http://localhost:8000/upload', {
+						await fetch(`${process.env.NEXT_PUBLIC_BACKEND_URL}/upload`, {
 							method: 'POST',
 							headers: {
 								Authorization: `Bearer ${accessToken}`,

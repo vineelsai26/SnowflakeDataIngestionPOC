@@ -26,7 +26,7 @@ export default function Home() {
 
 		async function getUserStages(access_token: string) {
 			const response = await fetch(
-				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/TEST_APP_2/schemas/TEST_SCHEMA/stages`,
+				`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/api/v2/databases/${process.env.NEXT_PUBLIC_SNOWFLAKE_DATABASE}/schemas/${process.env.NEXT_PUBLIC_SNOWFLAKE_SCHEMA}/stages`,
 				{
 					method: 'GET',
 					headers: {
@@ -37,7 +37,7 @@ export default function Home() {
 				}
 			)
 			if (response.status === 401) {
-				const token_response = await fetch('/api/tokens', {
+				const token_response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_PROXY_URL}/api/tokens`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

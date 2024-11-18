@@ -1,3 +1,4 @@
 flask
 snowflake-connector-python
 flask-cors
+python-dotenv
