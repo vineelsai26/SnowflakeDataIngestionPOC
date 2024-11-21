@@ -8,6 +8,7 @@ export default function Login() {
 	const code = searchParams.get('code')
 	const [hostname, setHostname] = useState('')
 	const [protocol, setProtocol] = useState('')
+	const [port, setPort] = useState('443')
 
 	useEffect(() => {
 		const access_token = window.localStorage.getItem('access_token')
@@ -17,17 +18,20 @@ export default function Login() {
 
 		async function tokenGenerator(code: string) {
 			try {
-				const res = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_PROXY_URL}/api/tokens`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						code: code,
-						redirect_url: window.location.hostname,
-						redirect_url_protocol: window.location.protocol,
-					}),
-				})
+				const res = await fetch(
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tokens`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							code: code,
+							redirect_url: `${window.location.hostname}:${window.location.port}`,
+							redirect_url_protocol: window.location.protocol,
+						}),
+					}
+				)
 
 				const data = await res.json()
 
@@ -50,6 +54,8 @@ export default function Login() {
 		console.log(window.location.hostname)
 		setProtocol(window.location.protocol)
 		console.log(window.location.protocol)
+		setPort(window.location.port)
+		console.log(window.location.port)
 	}, [code])
 
 	return (
@@ -58,7 +64,11 @@ export default function Login() {
 				className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
 				onClick={() => {
 					return redirect(
-						`https://${process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL}/oauth/authorize?response_type=code&client_id=${encodeURIComponent(process.env.NEXT_PUBLIC_SNOWFLAKE_CLIENT_ID!)}&redirect_uri=${protocol}//${hostname}/login`,
+						`https://${
+							process.env.NEXT_PUBLIC_SNOWFLAKE_ACCOUNT_URL
+						}/oauth/authorize?response_type=code&client_id=${encodeURIComponent(
+							process.env.NEXT_PUBLIC_SNOWFLAKE_CLIENT_ID!
+						)}&redirect_uri=${protocol}//${hostname}:${port}/login`
 					)
 				}}>
 				Login

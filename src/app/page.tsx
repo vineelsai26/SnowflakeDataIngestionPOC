@@ -37,16 +37,19 @@ export default function Home() {
 				}
 			)
 			if (response.status === 401) {
-				const token_response = await fetch(`${process.env.NEXT_PUBLIC_BACKEND_PROXY_URL}/api/tokens`, {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({
-						refresh_token: refresh_token,
-						grant_type: 'refresh_token',
-					}),
-				})
+				const token_response = await fetch(
+					`${process.env.NEXT_PUBLIC_BACKEND_URL}/api/tokens`,
+					{
+						method: 'POST',
+						headers: {
+							'Content-Type': 'application/json',
+						},
+						body: JSON.stringify({
+							refresh_token: refresh_token,
+							grant_type: 'refresh_token',
+						}),
+					}
+				)
 
 				const token_data = await token_response.json()
                 if (token_data.error){
